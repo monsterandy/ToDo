@@ -75,6 +75,15 @@ class BottomBar: UIView {
         self.addTextField.resignFirstResponder()
     }
     
+    func addEditMaskView(_ origin: CGPoint) {
+        let maskView = UIView(frame: CGRect(x: 0, y: -(origin.y-84), width: self.frame.width, height: origin.y-84))
+        maskView.backgroundColor = UIColor.blue
+        maskView.alpha = 0.5
+        maskView.isUserInteractionEnabled = true
+        self.addSubview(maskView)
+    }
+    
+    
     
     func keyboardWillShow(note: NSNotification) {
         self.addTextField.text = nil

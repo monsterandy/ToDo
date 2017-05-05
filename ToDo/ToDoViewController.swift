@@ -110,6 +110,10 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.contentOffset.y += self.moveScale
             })
+            self.tableView.isUserInteractionEnabled = false
+//            self.bottomBar.addEditMaskView(self.bottomBar.frame.origin)
+//            print(self.bottomBar.frame.origin)
+            
         }
         self.isEditViewMovedUp = true
     }
@@ -120,6 +124,7 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.contentOffset.y -= self.moveScale
             })
+            self.tableView.isUserInteractionEnabled = true
         }
         self.isEditViewMovedUp = false
     }
@@ -185,7 +190,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }
         }
         if !decelerate && tableView.contentOffset.y >= 76 && tableView.contentOffset.y < 152 {
-            print("EndDragging")
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
                 self.tableView.contentOffset.y = 152
             }) { (_) in
@@ -195,7 +199,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         if tableView.contentOffset.y >= 76 && tableView.contentOffset.y < 152 {
-            print("EndDecelerating")
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.contentOffset.y = 152
             }) { (_) in
