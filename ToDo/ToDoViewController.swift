@@ -8,7 +8,9 @@
 
 import UIKit
 
-class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, BottomBarDelegate {
+var activeField: UITextField?
+
+class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     var groundView: GroundView!
@@ -17,11 +19,12 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var headerViewTitleLabel: UILabel!
+    private var headerViewTitleTextField: UITextField!
     @IBOutlet weak var footerView: UIView!
     private var isBgChanged = false
     private var isTitleHided = false
     private var isEditViewMovedUp = false
-    private var todoCount:CGFloat = 11
+    private var todoCount:CGFloat = 8
     private var moveScale:CGFloat = 0
     private var baseFooterViewHeight: CGFloat = 583.0
     private var footerViewHeight: CGFloat = 583.0
@@ -30,7 +33,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         self.topBar = (self.navigationController?.navigationBar)! as! TopBar
-        
         let nib = UINib(nibName: "ToDoTableViewCell", bundle: nil)
         self.tableView.register(nib, forCellReuseIdentifier: "todoCell")
         self.tableView.delegate = self
@@ -45,19 +47,41 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             , y: frame.origin.y, width: frame.size.width, height: footerViewHeight)
         footerView.backgroundColor = UIColor.groupTableViewBackground
         NotificationCenter.default.addObserver(self, selector: #selector(self.setNavigationBar), name: .UIApplicationDidBecomeActive, object: nil)
-        headerView.backgroundColor = UIColor.clear
+        
+        self.headerView.backgroundColor = UIColor.clear
+        self.headerViewTitleLabel.text = topBar.getTitleText()
+        let titleLabelTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.titleLabelTapped(sender:)))
+        self.headerViewTitleLabel.addGestureRecognizer(titleLabelTapRecognizer)
+        self.headerViewTitleLabel.isUserInteractionEnabled = true
+        self.headerViewTitleTextField = UITextField(frame: CGRect(x: 21, y: 90, width: self.view.frame.width-21*2, height: 50))
+        self.headerViewTitleTextField.borderStyle = .none
+        self.headerViewTitleTextField.tintColor = UIColor.blue
+        self.headerViewTitleTextField.clearButtonMode = .whileEditing
+        self.headerViewTitleTextField.layer.cornerRadius = 4.0
+        self.headerViewTitleTextField.backgroundColor = UIColor(white: 0.6, alpha: 0.7)
+        self.headerViewTitleTextField.alpha = 0
+        self.headerViewTitleTextField.delegate = self
+        self.headerViewTitleTextField.returnKeyType = .done
+        let attributes = [NSForegroundColorAttributeName: UIColor.white, NSFontAttributeName: UIFont(name: "Avenir Next", size: 38.0)!]
+        self.headerViewTitleTextField.attributedText = NSAttributedString(string: self.headerViewTitleLabel.text!, attributes: attributes)
+        
+        self.headerView.addSubview(headerViewTitleTextField)
+        
         groundView = GroundView(frame: view.frame)
         self.view.insertSubview(groundView, belowSubview: tableView)
         bottomBar = BottomBar(frame: CGRect(x: 0, y: self.view.frame.height-57, width: self.view.frame.width, height: 57))
         self.view.addSubview(bottomBar)
-        bottomBar.delegate = self
-        print(view.frame.width)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(note:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyBoardWillHiden(note:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
     }
     
     func setNavigationBar() {
         self.navigationController!.navigationBar.frame = CGRect(x: 0, y: 20, width: self.view.frame.size.width, height: 64)
     }
+    
+    // MARK - Title Label
     
     func hideHeaderTitle() {
         UIView.animate(withDuration: 0.15) {
@@ -66,10 +90,35 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     func showHeaderTitle() {
+        self.headerViewTitleLabel.text = topBar.getTitleText()
         UIView.animate(withDuration: 0.2) {
             self.headerViewTitleLabel.alpha = 1
         }
     }
+    
+    func titleLabelTapped(sender: UITapGestureRecognizer) {
+        self.headerViewTitleLabel.alpha = 0
+        self.headerViewTitleTextField.alpha = 1
+        self.headerViewTitleTextField.becomeFirstResponder()
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        activeField = textField
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        activeField = nil
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.headerViewTitleTextField.resignFirstResponder()
+        self.topBar.setTitleText(self.headerViewTitleTextField.text!)
+        self.headerViewTitleLabel.text = self.topBar.getTitleText()
+        self.headerViewTitleTextField.alpha = 0
+        self.headerViewTitleLabel.alpha = 1
+        return true
+    }
+    
     
     func setfooterViewHeight() {
         switch self.view.frame.height {
@@ -92,17 +141,72 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     
+    // MARK - Notification Center
+    func keyboardWillShow(note: NSNotification) {
+        let userInfo = note.userInfo!
+        let keyboardBounds = (userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+        let duration = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
+        let deltaY = keyboardBounds.size.height
+        if let activeField = activeField {
+            if activeField == self.headerViewTitleTextField {
+                // headerView
+                self.tableView.isScrollEnabled = false
+            } else if activeField == self.topBar.getTitleTextField() {
+                // topBar
+                self.tableView.isUserInteractionEnabled = false
+            } else if activeField == self.bottomBar.getAddTextField() {
+                self.bottomBar.prepareForEdit()
+                if duration > 0 {
+                    let options = UIViewAnimationOptions(rawValue: UInt((userInfo[UIKeyboardAnimationCurveUserInfoKey] as! NSNumber).intValue << 16))
+                    UIView.animate(withDuration: duration, delay: 0, options: options, animations: {
+                        self.bottomBar.transform = CGAffineTransform(translationX: 0 , y: -deltaY)
+                    }, completion: nil)
+                    self.bottomBarDidMovedUp()
+                } else {
+                    self.bottomBar.transform = CGAffineTransform(translationX: 0 , y: -deltaY)
+                }
+            }
+        }
+        
+    }
+    
+    func keyBoardWillHiden(note: NSNotification) {
+        print("keyBoardWillHiden")
+        let userInfo = note.userInfo!
+        let duration = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
+        if let activeField = activeField {
+            if activeField == self.headerViewTitleTextField {
+                // headerView
+                self.tableView.isScrollEnabled = true
+            } else if activeField == self.topBar.getTitleTextField() {
+                // topBar
+                self.tableView.isUserInteractionEnabled = true
+            } else if activeField == self.bottomBar.getAddTextField() {
+                if duration > 0 {
+                    let options = UIViewAnimationOptions(rawValue: UInt((userInfo[UIKeyboardAnimationCurveUserInfoKey] as! NSNumber).intValue << 16))
+                    UIView.animate(withDuration: duration, delay: 0, options: options, animations: {
+                        self.bottomBar.transform = CGAffineTransform.identity
+                    }, completion: nil)
+                    self.bottomBarDidMovedDown()
+                } else {
+                    self.bottomBar.transform = CGAffineTransform.identity
+                }
+            }
+        }
+    }
+
+    
     // MARK - Bottom Bar Delegate
-    func bottomBarDidMovedUp(bottomBar: BottomBar, deltaY: CGFloat) {
+    func bottomBarDidMovedUp() {
         let contentSize: CGFloat
         if isTitleHided {
             contentSize = todoCount * self.tableView.rowHeight + 84
         } else {
             contentSize = todoCount * self.tableView.rowHeight + 152 + 84
         }
-//        if !isEditViewMovedUp {
+        if !isEditViewMovedUp {
             self.moveScale = contentSize - (self.view.bounds.height - 289.5 - 101.5)
-//        }
+        }
         if !isTitleHided && moveScale < 152 {
             self.moveScale = 152.0
         }
@@ -111,15 +215,11 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
                 self.tableView.contentOffset.y += self.moveScale
             })
             self.tableView.isUserInteractionEnabled = false
-//            self.bottomBar.addEditMaskView(self.bottomBar.frame.origin)
-//            print(self.bottomBar.frame.origin)
-            
         }
         self.isEditViewMovedUp = true
     }
     
-    func bottomBarDidMovedDown(bottomBar: BottomBar) {
-        print(moveScale)
+    func bottomBarDidMovedDown() {
         if isEditViewMovedUp && moveScale > 0 {
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.contentOffset.y -= self.moveScale
@@ -130,8 +230,20 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("touchesEnded")
-        self.bottomBar.cancelEdit()
+        if activeField == self.topBar.getTitleTextField() {
+            self.topBar.finishEdit()
+        }
+        if activeField == self.bottomBar.getAddTextField() {
+            self.bottomBar.cancelEdit()
+        }
+        if activeField == self.headerViewTitleTextField {
+            self.headerViewTitleTextField.resignFirstResponder()
+            self.topBar.setTitleText(self.headerViewTitleTextField.text!)
+            self.headerViewTitleLabel.text = self.topBar.getTitleText()
+            self.headerViewTitleTextField.alpha = 0
+            self.headerViewTitleLabel.alpha = 1
+        }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -211,6 +323,5 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
 //            }
 //        }
     }
-    
     
 }
