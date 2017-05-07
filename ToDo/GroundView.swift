@@ -25,7 +25,6 @@ class GroundView: UIView {
         topMaskView = UIView(frame: self.frame)
         topMaskView.backgroundColor = UIColor(red: 198/255, green: 60/255, blue: 34/255, alpha: 0)
         self.addSubview(topMaskView)
-        
         self.backgroundColor = UIColor(red: 60/255, green: 160/255, blue: 183/255, alpha: 1)
     }
     

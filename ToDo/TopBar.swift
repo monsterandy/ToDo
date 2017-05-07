@@ -94,7 +94,6 @@ class TopBar: UINavigationBar, UINavigationBarDelegate, UITextFieldDelegate {
         return self.titleTextField
     }
     
-    
     func hideTitleLabel() {
         UIView.animate(withDuration: 0.15) {
             self.titleLabel.center.y += 15

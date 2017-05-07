@@ -35,9 +35,7 @@ class BottomBar: UIView, UITextFieldDelegate {
         addButton.setImage(UIImage(named: "addButton"), for: UIControlState.normal)
         addButton.isEnabled = false
         addButton.alpha = 0
-        
         self.addSubview(addButton)
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -53,16 +51,12 @@ class BottomBar: UIView, UITextFieldDelegate {
         self.addImageView.image = UIImage(named: "addLabel")
     }
     
-    func addEditMaskView(_ origin: CGPoint) {
-        let maskView = UIView(frame: CGRect(x: 0, y: -(origin.y-84), width: self.frame.width, height: origin.y-84))
-        maskView.backgroundColor = UIColor.blue
-        maskView.alpha = 0.5
-        maskView.isUserInteractionEnabled = true
-        self.addSubview(maskView)
-    }
-    
     func getAddTextField() -> UITextField {
         return self.addTextField
+    }
+    
+    func setAddTextFieldEnable(_ isEnable: Bool) {
+        self.addTextField.isUserInteractionEnabled = isEnable
     }
     
     func prepareForEdit() {

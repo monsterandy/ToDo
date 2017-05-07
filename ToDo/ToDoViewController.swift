@@ -46,7 +46,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
         footerView.frame = CGRect(x: frame.origin.x
             , y: frame.origin.y, width: frame.size.width, height: footerViewHeight)
         footerView.backgroundColor = UIColor.groupTableViewBackground
-        NotificationCenter.default.addObserver(self, selector: #selector(self.setNavigationBar), name: .UIApplicationDidBecomeActive, object: nil)
         
         self.headerView.backgroundColor = UIColor.clear
         self.headerViewTitleLabel.text = topBar.getTitleText()
@@ -64,7 +63,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
         self.headerViewTitleTextField.returnKeyType = .done
         let attributes = [NSForegroundColorAttributeName: UIColor.white, NSFontAttributeName: UIFont(name: "Avenir Next", size: 38.0)!]
         self.headerViewTitleTextField.attributedText = NSAttributedString(string: self.headerViewTitleLabel.text!, attributes: attributes)
-        
         self.headerView.addSubview(headerViewTitleTextField)
         
         groundView = GroundView(frame: view.frame)
@@ -72,9 +70,14 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
         bottomBar = BottomBar(frame: CGRect(x: 0, y: self.view.frame.height-57, width: self.view.frame.width, height: 57))
         self.view.addSubview(bottomBar)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.setNavigationBar), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(note:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyBoardWillHiden(note:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.setNavigationBar()
     }
     
     func setNavigationBar() {
@@ -82,7 +85,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     // MARK - Title Label
-    
     func hideHeaderTitle() {
         UIView.animate(withDuration: 0.15) {
             self.headerViewTitleLabel.alpha = 0
@@ -119,7 +121,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return true
     }
     
-    
     func setfooterViewHeight() {
         switch self.view.frame.height {
         case 667.0:
@@ -139,7 +140,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.footerViewHeight = self.baseFooterViewHeight - todoCount * self.tableView.rowHeight
         }
     }
-    
     
     // MARK - Notification Center
     func keyboardWillShow(note: NSNotification) {
@@ -167,11 +167,9 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
                 }
             }
         }
-        
     }
     
     func keyBoardWillHiden(note: NSNotification) {
-        print("keyBoardWillHiden")
         let userInfo = note.userInfo!
         let duration = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
         if let activeField = activeField {
@@ -194,7 +192,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }
         }
     }
-
     
     // MARK - Bottom Bar Delegate
     func bottomBarDidMovedUp() {
@@ -210,7 +207,7 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
         if !isTitleHided && moveScale < 152 {
             self.moveScale = 152.0
         }
-        if !isEditViewMovedUp && moveScale > 0{
+        if !isEditViewMovedUp && moveScale > 0 {
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.contentOffset.y += self.moveScale
             })
@@ -243,12 +240,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.headerViewTitleTextField.alpha = 0
             self.headerViewTitleLabel.alpha = 1
         }
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.setNavigationBar()
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -258,7 +249,6 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return Int(todoCount)
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoCell", for: indexPath) as! ToDoTableViewCell
@@ -281,6 +271,8 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.topBar.hideTitleLabel()
         }
         
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        self.perform(#selector(scrollViewDidEndScrollingAnimation(_:)), with: nil, afterDelay: 0.2)
         
         if !isBgChanged && tableView.contentOffset.y > 152 {
             isBgChanged = true
@@ -291,10 +283,11 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.tableView.backgroundColor = UIColor.clear
         }
         groundView.updateAlpha(tableView.contentOffset.y)
-        
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.bottomBar.setAddTextFieldEnable(false)
+        
         if !decelerate && tableView.contentOffset.y < 76 {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
                 self.tableView.contentOffset.y = 0
@@ -316,12 +309,17 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }) { (_) in
             }
         }
-//        if tableView.contentOffset.y < 76 {
-//            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-//                self.tableView.contentOffset.y = 0
-//            }) { (_) in
-//            }
-//        }
+        if tableView.contentOffset.y < 76 {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+                self.tableView.contentOffset.y = 0
+            }) { (_) in
+            }
+        }
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        self.bottomBar.setAddTextFieldEnable(true)
     }
     
 }
