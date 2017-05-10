@@ -73,6 +73,7 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
         NotificationCenter.default.addObserver(self, selector: #selector(self.setNavigationBar), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(note:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyBoardWillHiden(note:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.showMenuViewController), name: Notification.Name(rawValue: "menuButtonTapped"), object: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -82,6 +83,11 @@ class ToDoViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func setNavigationBar() {
         self.navigationController!.navigationBar.frame = CGRect(x: 0, y: 20, width: self.view.frame.size.width, height: 64)
+    }
+    
+    func showMenuViewController() {
+        let menuVC = MenuViewController()
+        self.present(menuVC, animated: true, completion: nil)
     }
     
     // MARK - Title Label

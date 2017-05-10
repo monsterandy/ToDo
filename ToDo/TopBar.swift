@@ -14,6 +14,7 @@ class TopBar: UINavigationBar, UINavigationBarDelegate, UITextFieldDelegate {
     private var titleLabel: UILabel!
     private var titleText: String!
     private var titleTextField: UITextField!
+    private var menuButton: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -47,6 +48,12 @@ class TopBar: UINavigationBar, UINavigationBarDelegate, UITextFieldDelegate {
         titleTextField.backgroundColor = UIColor(white: 0.1, alpha: 0.2)
         titleTextField.alpha = 0
         titleTextField.delegate = self
+        
+        menuButton = UIButton(frame: CGRect(x: UIScreen.main.bounds.width - 45, y: 14, width: 40, height: 40))
+        menuButton.tintColor = UIColor.white
+        menuButton.setTitle("M", for: UIControlState.normal)
+        menuButton.addTarget(self, action: #selector(self.menuButtonTapped), for: UIControlEvents.touchUpInside)
+        customView.addSubview(menuButton)
         customView.addSubview(titleLabel)
         customView.addSubview(titleTextField)
         self.addSubview(customView)
@@ -58,6 +65,10 @@ class TopBar: UINavigationBar, UINavigationBarDelegate, UITextFieldDelegate {
         self.titleLabel.alpha = 0
         self.titleTextField.alpha = 1
         self.titleTextField.becomeFirstResponder()
+    }
+    
+    func menuButtonTapped() {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "menuButtonTapped"), object: nil)
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
