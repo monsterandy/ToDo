@@ -11,6 +11,8 @@
 		A10344EB1EC09FEF0093459C /* MenuTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10344E91EC09FEF0093459C /* MenuTableViewCell.swift */; };
 		A10344EC1EC09FEF0093459C /* MenuTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A10344EA1EC09FEF0093459C /* MenuTableViewCell.xib */; };
 		A10344F21EC1E19F0093459C /* MenuViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A10344F11EC1E19F0093459C /* MenuViewController.xib */; };
+		A10344F41EC2B8BE0093459C /* PopoverMenuAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10344F31EC2B8BE0093459C /* PopoverMenuAnimator.swift */; };
+		A10344F61EC2BACF0093459C /* PopoverActionPresentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10344F51EC2BACE0093459C /* PopoverActionPresentController.swift */; };
 		A1642FE41EBC2173003F1D56 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1642FE31EBC2173003F1D56 /* Model.swift */; };
 		A1F6016F1EB6120600495BDB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1F601611EB6120600495BDB /* Assets.xcassets */; };
 		A1F601701EB6120600495BDB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A1F601631EB6120600495BDB /* LaunchScreen.storyboard */; };
@@ -29,6 +31,8 @@
 		A10344E91EC09FEF0093459C /* MenuTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MenuTableViewCell.swift; path = ToDo/Menu/MenuTableViewCell.swift; sourceTree = "<group>"; };
 		A10344EA1EC09FEF0093459C /* MenuTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MenuTableViewCell.xib; path = ToDo/Menu/MenuTableViewCell.xib; sourceTree = "<group>"; };
 		A10344F11EC1E19F0093459C /* MenuViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuViewController.xib; sourceTree = "<group>"; };
+		A10344F31EC2B8BE0093459C /* PopoverMenuAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopoverMenuAnimator.swift; path = ToDo/Menu/PopoverMenuAnimator.swift; sourceTree = "<group>"; };
+		A10344F51EC2BACE0093459C /* PopoverActionPresentController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopoverActionPresentController.swift; path = ToDo/Menu/PopoverActionPresentController.swift; sourceTree = "<group>"; };
 		A1642FE31EBC2173003F1D56 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Model.swift; path = ToDo/Model.swift; sourceTree = "<group>"; };
 		A1A6097E1EAA2D4C009BEF89 /* ToDo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1F601611EB6120600495BDB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ToDo/Assets.xcassets; sourceTree = "<group>"; };
@@ -61,6 +65,8 @@
 				A10344F11EC1E19F0093459C /* MenuViewController.xib */,
 				A10344E91EC09FEF0093459C /* MenuTableViewCell.swift */,
 				A10344EA1EC09FEF0093459C /* MenuTableViewCell.xib */,
+				A10344F31EC2B8BE0093459C /* PopoverMenuAnimator.swift */,
+				A10344F51EC2BACE0093459C /* PopoverActionPresentController.swift */,
 			);
 			name = Menu;
 			sourceTree = "<group>";
@@ -178,6 +184,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1642FE41EBC2173003F1D56 /* Model.swift in Sources */,
+				A10344F61EC2BACF0093459C /* PopoverActionPresentController.swift in Sources */,
+				A10344F41EC2B8BE0093459C /* PopoverMenuAnimator.swift in Sources */,
 				A1F6017A1EB6120600495BDB /* TopBar.swift in Sources */,
 				A1F601751EB6120600495BDB /* BottomBar.swift in Sources */,
 				A1F601741EB6120600495BDB /* AppDelegate.swift in Sources */,
